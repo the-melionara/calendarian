@@ -47,16 +47,21 @@ impl Calendar {
     }
 
     pub fn starting_weekday_of_month(&self, year: YearInt, month: MonthUint) -> u32 {
-        assert!(year == 0 && month == 0); // for simplicity for now
+        assert!(year == 0); // for simplicity for now
 
-        return (self.start_offset as usize % self.week_def.days().len()) as u32;
+        let day_offset = self.start_offset as GlobalDayInt + self.months.iter()
+            .take(month as usize)
+            .map(|x| x.length())
+            .sum::<u32>() as GlobalDayInt;
+
+        return (day_offset as usize % self.week_def.days().len()) as u32;
     }
 
     pub fn global_to_local(&self, global: GlobalDayInt) -> DayVec {
         let relative = global - self.start_date;
         let year_len = self.months.iter().map(|x| x.length()).sum::<u32>() as GlobalDayInt;
 
-        let year = relative / year_len; // TODO: TAKE INTO ACCOUNT LEAP DAYS AND NON-ZERO-YEAR CALENDARS
+        let year = relative.div_floor(year_len); // TODO: TAKE INTO ACCOUNT LEAP DAYS AND NON-ZERO-YEAR CALENDARS
 
         // Extract month and day
         let mut day = relative - year * year_len;

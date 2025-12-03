@@ -1,6 +1,10 @@
 **TODO:**
 - [x] Hard coded project
 - [ ] Hard coded calendar view
+  - [x] Single month
+  - [x] Single year
+  - [ ] Multiyear
+  - [ ] Multiple view types
 - [ ] Undo system
 - [ ] Very simple event placement (just name and abs day)
 - [ ] Custom week days

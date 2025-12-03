@@ -1,3 +1,5 @@
+#![feature(int_roundings)]
+
 use app::Application;
 use egui::ViewportBuilder;
 

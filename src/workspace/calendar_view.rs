@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use egui::{Align, Frame, Grid, Label, Layout, Response, RichText, ScrollArea, Sense, Stroke, UiBuilder};
 
-use crate::{calendar::{months::Month, weeks::Week, Calendar, MonthUint}, project::Project, utils::ui_tools::enum_selection};
+use crate::{calendar::{day::DayVec, months::Month, weeks::Week, Calendar, GlobalDayInt, MonthUint}, project::Project, utils::ui_tools::enum_selection};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum CalendarDisplayType {
@@ -50,6 +50,8 @@ impl CalendarUI {
                 self.month += 1;
             }
 
+            ui.label(month.name());
+
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 self.display_type = enum_selection(
                     ui,
@@ -89,10 +91,19 @@ impl CalendarUI {
         
             grid.show(ui, |ui| {
                 let mut day = 1;
+                let mut global_day = calendar.local_to_global(DayVec {
+                    year: 0,
+                    month: month as MonthUint,
+                    day: 0
+                }) - starting_weekday as GlobalDayInt;
+
                 for _ in 0..row_len {
                     for _ in 0..col_len {
-                        day_ui(ui, day, day > calendar.months()[month].length() + starting_weekday || day <= starting_weekday);
+                        let dimmed = day > calendar.months()[month].length() + starting_weekday
+                                || day <= starting_weekday;
+                        day_ui(ui, calendar.global_to_local(global_day).day + 1, dimmed);
                         day += 1;
+                        global_day += 1;
                     }
                     ui.end_row();
                 };
