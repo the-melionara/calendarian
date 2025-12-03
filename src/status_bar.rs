@@ -8,7 +8,12 @@ pub struct StatusBar {
 }
 
 impl StatusBar {
-    pub fn update(&mut self, ctx: &egui::Context, app_ctx: &mut AppContext<'_>, interactable: bool) {
+    pub fn update(
+        &mut self,
+        ctx: &egui::Context,
+        app_ctx: &mut AppContext<'_>,
+        interactable: bool
+    ) {
         TopBottomPanel::top("status_bar").show(ctx, |ui| ui.add_enabled_ui(interactable, |ui| {
             egui::menu::bar(ui, |ui| {
                 ui.menu_button("File", |ui| self.file_dropdown(ui, app_ctx));

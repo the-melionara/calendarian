@@ -41,10 +41,13 @@ impl Application {
     fn handle_upstream(&mut self, ctx: &egui::Context) {
         while let Some(cmd) = self.upstream.pop_cmd() {
             match cmd {
-                UpstreamCmd::TryQuit | UpstreamCmd::ForceQuit => ctx.send_viewport_cmd(ViewportCommand::Close),
+                UpstreamCmd::TryQuit
+                | UpstreamCmd::ForceQuit => ctx.send_viewport_cmd(ViewportCommand::Close),
                 UpstreamCmd::OpenProject(path) => {
                     let wsp = WorkspaceState::new(path);
-                    ctx.send_viewport_cmd(ViewportCommand::Title(format!("{} - Calendarian", wsp.project().name())));
+                    ctx.send_viewport_cmd(
+                        ViewportCommand::Title(format!("{} - Calendarian", wsp.project().name()))
+                    );
                     self.state = AppState::Workspace(wsp);
                 },
                 UpstreamCmd::TryCloseProject | UpstreamCmd::ForceCloseProject => {
@@ -61,6 +64,7 @@ impl eframe::App for Application {
         egui::CentralPanel::default().show(ctx, |ui| {
             let mut interactable = true;
 
+            // Handle modals
             let mut swap = Vec::new();
             std::mem::swap(&mut swap, &mut self.modals);
             for modal in swap.iter_mut().rev() {
@@ -68,7 +72,8 @@ impl eframe::App for Application {
                 interactable = false;
             }
             std::mem::swap(&mut swap, &mut self.modals);
-            
+
+            // Handle everything else
             {
                 let mut app_ctx = AppContext { upstream: &mut self.upstream, state: &self.state };
                 self.status_bar.update(ctx, &mut app_ctx, interactable);

@@ -51,7 +51,12 @@ impl CalendarUI {
             }
 
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                self.display_type = enum_selection(ui, "span-selection", CalendarDisplayType::VALUES, self.display_type);
+                self.display_type = enum_selection(
+                    ui,
+                    "span-selection",
+                    CalendarDisplayType::VALUES,
+                    self.display_type
+                );
             });
         });
     
@@ -59,8 +64,24 @@ impl CalendarUI {
         self.calendar_body(ui, col_len, row_len, starting_weekday, calendar);
     }
 
-    fn calendar_body(&self, ui: &mut egui::Ui, col_len: u32, row_len: u32, starting_weekday: u32, calendar: &Calendar) {
-        fn inner_body(ui: &mut egui::Ui, row_width: f32, row_height: f32, row_len: u32, col_len: u32, starting_weekday: u32, calendar: &Calendar, month: usize) {
+    fn calendar_body(
+        &self,
+        ui: &mut egui::Ui,
+        col_len: u32,
+        row_len: u32,
+        starting_weekday: u32,
+        calendar: &Calendar
+    ) {
+        fn inner_body(
+            ui: &mut egui::Ui,
+            row_width: f32,
+            row_height: f32,
+            row_len: u32,
+            col_len: u32,
+            starting_weekday: u32,
+            calendar: &Calendar,
+            month: usize
+        ) {
             let grid = Grid::new("calendar-body")
                 .spacing((0.0, 0.0))
                 .max_col_width(row_width)
@@ -82,11 +103,27 @@ impl CalendarUI {
         let row_height = ui.available_height() / row_len as f32;
 
         if row_height < row_width * 0.5 { // yes scroll
-            ScrollArea::vertical().show(ui, |ui|
-                inner_body(ui, row_width, row_width * 0.5, row_len, col_len, starting_weekday, calendar, self.month as usize)
-            );
+            ScrollArea::vertical().show(ui, |ui| inner_body(
+                ui,
+                row_width,
+                row_width * 0.5,
+                row_len,
+                col_len,
+                starting_weekday,
+                calendar,
+                self.month as usize
+            ));
         } else { // no scroll
-            inner_body(ui, row_width, row_height, row_len, col_len, starting_weekday, calendar, self.month as usize);
+            inner_body(
+                ui,
+                row_width,
+                row_height,
+                row_len,
+                col_len,
+                starting_weekday,
+                calendar,
+                self.month as usize
+            );
         }
     }
 
@@ -118,7 +155,10 @@ fn day_ui(ui: &mut egui::Ui, number: u32, dimmed: bool) -> Response {
             // let text_col = visuals.text_color();
 
             Frame::canvas(ui.style())
-                .fill(visuals.bg_fill.gamma_multiply(if dimmed { 0.1 } else { 0.3 } + if response.hovered() { 0.2 } else { 0.0 }))
+                .fill(
+                    visuals.bg_fill.gamma_multiply(if dimmed { 0.1 } else { 0.3 }
+                        + if response.hovered() { 0.2 } else { 0.0 })
+                )
                 .outer_margin(2.5)
                 .corner_radius(0.0)
                 .inner_margin(5.0)
