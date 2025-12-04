@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use calendar_view::CalendarUI;
 use egui::CentralPanel;
 
-use crate::project::Project;
+use crate::model::project::Project;
 
 pub mod calendar_view;
 

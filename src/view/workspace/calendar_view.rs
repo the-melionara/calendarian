@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use egui::{Align, Frame, Grid, Label, Layout, Response, RichText, ScrollArea, Sense, Stroke, UiBuilder};
 
-use crate::{calendar::{day::DayVec, months::Month, weeks::Week, Calendar, GlobalDayInt, MonthUint, YearInt}, project::Project, utils::ui_tools::enum_selection};
+use crate::{model::{calendar::{day::DayVec, weeks::Week, Calendar, GlobalDayInt, MonthUint, YearInt}, project::Project}, view::ui_tools::enum_selection};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum CalendarDisplayType {

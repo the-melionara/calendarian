@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::calendar::Calendar;
+use crate::model::calendar::Calendar;
 
 #[derive(Debug)]
 pub struct Project {

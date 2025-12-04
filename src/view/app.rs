@@ -1,6 +1,6 @@
 use egui::ViewportCommand;
 
-use crate::{modals::Modal, project_selection::ProjectSelectionState, status_bar::StatusBar, upstream::{Upstream, UpstreamCmd}, workspace::WorkspaceState};
+use crate::{upstream::{Upstream, UpstreamCmd}, view::{modals::Modal, project_selection::ProjectSelectionState, status_bar::StatusBar, workspace::WorkspaceState}};
 
 #[derive(Debug)]
 pub enum AppState {

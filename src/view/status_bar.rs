@@ -1,6 +1,6 @@
 use egui::{Button, TopBottomPanel};
 
-use crate::{app::{AppContext, AppState}, upstream::UpstreamCmd};
+use crate::{view::app::{AppContext, AppState}, upstream::UpstreamCmd};
 
 #[derive(Default)]
 pub struct StatusBar {
