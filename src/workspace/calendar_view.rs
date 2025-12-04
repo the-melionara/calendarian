@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use egui::{Align, Frame, Grid, Label, Layout, Response, RichText, ScrollArea, Sense, Stroke, UiBuilder};
 
-use crate::{calendar::{day::DayVec, months::Month, weeks::Week, Calendar, GlobalDayInt, MonthUint}, project::Project, utils::ui_tools::enum_selection};
+use crate::{calendar::{day::DayVec, months::Month, weeks::Week, Calendar, GlobalDayInt, MonthUint, YearInt}, project::Project, utils::ui_tools::enum_selection};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum CalendarDisplayType {
@@ -28,6 +28,7 @@ impl Display for CalendarDisplayType {
 pub struct CalendarUI {
     display_type: CalendarDisplayType,
     month: MonthUint,
+    year: YearInt,
 }
 
 impl CalendarUI {
@@ -36,21 +37,31 @@ impl CalendarUI {
         let week_def = calendar.week_def();
         let month = &calendar.months()[self.month as usize];
 
-        let starting_weekday = calendar.starting_weekday_of_month(0, self.month);
+        let starting_weekday = calendar.starting_weekday_of_month(self.year, self.month);
     
         let col_len = week_def.days().len() as u32;
         let row_len = (month.length() + starting_weekday).div_ceil(col_len);
 
         egui::menu::bar(ui, |ui| {
             _ = ui.button("Today");
-            if ui.button("<").clicked() && self.month > 0 {
-                self.month -= 1;
+            if ui.button("<").clicked() {
+                if self.month > 0 {
+                    self.month -= 1;
+                } else  {
+                    self.month = (calendar.months().len() - 1) as u32;
+                    self.year -= 1;
+                }
             }
-            if ui.button(">").clicked() && (self.month as usize) < calendar.months().len() - 1 {
-                self.month += 1;
+            if ui.button(">").clicked() {
+                if (self.month as usize) < calendar.months().len() - 1 {
+                    self.month += 1;
+                } else  {
+                    self.month = 0;
+                    self.year += 1;
+                }
             }
 
-            ui.label(month.name());
+            ui.label(format!("{} {}", month.name(), self.year));
 
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 self.display_type = enum_selection(

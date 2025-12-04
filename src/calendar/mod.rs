@@ -29,7 +29,7 @@ impl Calendar {
             week_def: Week::new(),
             months: vec![
                 Month::new("Springino", 31),
-                Month::new("Summerino", 25),
+                Month::new("Summerino", 23),
                 Month::new("Autumnino", 90),
                 Month::new("Winterino", 15),
             ],
@@ -47,14 +47,8 @@ impl Calendar {
     }
 
     pub fn starting_weekday_of_month(&self, year: YearInt, month: MonthUint) -> u32 {
-        assert!(year == 0); // for simplicity for now
-
-        let day_offset = self.start_offset as GlobalDayInt + self.months.iter()
-            .take(month as usize)
-            .map(|x| x.length())
-            .sum::<u32>() as GlobalDayInt;
-
-        return (day_offset as usize % self.week_def.days().len()) as u32;
+        let global = self.local_to_global(DayVec { year, month, day: 0 });
+        return global.rem_euclid(self.week_def.days().len() as GlobalDayInt) as u32;
     }
 
     pub fn global_to_local(&self, global: GlobalDayInt) -> DayVec {

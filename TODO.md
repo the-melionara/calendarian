@@ -3,9 +3,10 @@
 - [ ] Hard coded calendar view
   - [x] Single month
   - [x] Single year
-  - [ ] Multiyear
+  - [x] Multiyear
   - [ ] Multiple view types
-- [ ] Undo system
+- [ ] Leap years
+  - [ ] Relative day caching system or something
 - [ ] Very simple event placement (just name and abs day)
 - [ ] Custom week days
 - [ ] Custom months
