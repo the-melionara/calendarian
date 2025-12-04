@@ -52,7 +52,7 @@ impl Calendar {
     }
 
     pub fn global_to_local(&self, global: GlobalDayInt) -> DayVec {
-        let relative = global - self.start_date;
+        let relative = global - self.start_date + self.start_offset as GlobalDayInt;
         let year_len = self.months.iter().map(|x| x.length()).sum::<u32>() as GlobalDayInt;
 
         let year = relative.div_floor(year_len); // TODO: TAKE INTO ACCOUNT LEAP DAYS AND NON-ZERO-YEAR CALENDARS
@@ -77,16 +77,19 @@ impl Calendar {
 
     pub fn local_to_global(&self, local: DayVec) -> GlobalDayInt {
         // Calculate day offset from start of year
-        let mut day_offset = 0;
+        let mut days_into_year = 0;
         for i in 0..local.month {
-            day_offset += self.length_of_month(local.year, i) as GlobalDayInt;
+            days_into_year += self.length_of_month(local.year, i) as GlobalDayInt;
         }
 
         let year_len = self.months.iter().map(|x| x.length()).sum::<u32>() as GlobalDayInt;
 
         // TODO: TAKE INTO ACCOUNT LEAP DAYS AND NON-ZERO-YEAR CALENDARS
         let days_since_ref = year_len * local.year as GlobalDayInt;
-        return days_since_ref + day_offset + self.start_date;
+        return days_since_ref // Days since the ref day (year precision)
+            + days_into_year // Days since start of the year
+            + self.start_date // Day of start of calendar
+            - self.start_offset as GlobalDayInt; // Calendar day this calendar started on
     }
 
     pub fn length_of_month(&self, year: YearInt, month: MonthUint) -> u32 {
