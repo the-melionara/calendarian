@@ -8,6 +8,7 @@ mod modals;
 mod project_selection;
 mod status_bar;
 mod workspace;
+mod widgets;
 
 pub fn main() -> eframe::Result {
     let options = eframe::NativeOptions {

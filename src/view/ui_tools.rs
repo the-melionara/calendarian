@@ -19,3 +19,23 @@ pub fn enum_selection<T: Display + Copy + PartialEq>(
     });
     return res;
 }
+
+pub fn grid_pack(min: u32, row_priority: bool) -> (u32, u32) {
+    let mut a = 1;
+    let mut b = 1;
+
+    while a * b < min {
+        if a == b {
+            b += 1;
+        } else {
+            a = b;
+        }
+    }
+
+    return if row_priority {
+        (a.max(b), a.min(b))
+    } else {
+        (a.min(b), a.max(b))
+    };
+}
+

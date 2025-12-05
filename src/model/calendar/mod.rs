@@ -32,6 +32,7 @@ impl Calendar {
                 Month::new("Summerino", 23),
                 Month::new("Autumnino", 90),
                 Month::new("Winterino", 15),
+                Month::new("Pingino", 26),
             ],
             start_date: 13,
             start_offset: 69,
