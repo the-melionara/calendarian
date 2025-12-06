@@ -7,6 +7,7 @@ pub mod months;
 pub mod day;
 
 pub type GlobalDayInt = i64;
+pub type GlobalWeekInt = i64;
 pub type YearInt = i32;
 pub type MonthUint = u32;
 pub type DayUint = u32;

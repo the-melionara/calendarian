@@ -1,6 +1,6 @@
 use egui::{Align, Frame, Grid, Label, Response, RichText, ScrollArea, Sense, Stroke, UiBuilder};
 
-use crate::{model::calendar::{day::DayVec, weeks::Week, Calendar, GlobalDayInt, MonthUint, YearInt}, view::{ui_tools::grid_pack, workspace::calendar_view::CalendarDisplayType}};
+use crate::{model::calendar::{day::DayVec, weeks::Week, Calendar, GlobalDayInt, GlobalWeekInt, MonthUint, YearInt}, view::{ui_tools::grid_pack, workspace::calendar_view::CalendarDisplayType}};
 
 pub fn calendar_widget(
     ui: &mut egui::Ui,
@@ -14,7 +14,24 @@ pub fn calendar_widget(
 
     match unit {
         CalendarUnit::Day(day_vec) => todo!(),
-        CalendarUnit::Week(year, week) => todo!(),
+        CalendarUnit::Week(week) => {
+            let starting_day = week * calendar.week_def().days().len() as GlobalDayInt;
+            let col_len = calendar.week_def().days().len() as u32;
+            
+            header(ui, col_len, calendar.week_def());
+            body(ui, col_len, 1, |ui| {
+                for i in 0..col_len {
+                    atom_ui(
+                        ui,
+                        &format!(
+                            "{}",
+                            calendar.global_to_local(starting_day + i as GlobalDayInt).day + 1
+                        ),
+                        false
+                    );
+                }
+            });
+        },
         CalendarUnit::Month(year, month) => {
             let month_def = &calendar.months()[month as usize];
 
@@ -76,7 +93,7 @@ pub fn calendar_widget(
 #[derive(Clone, Copy, Debug)]
 pub enum CalendarUnit {
     Day(DayVec),
-    Week(YearInt, u32),
+    Week(GlobalWeekInt),
     Month(YearInt, MonthUint),
     Year(YearInt),
 }
@@ -85,7 +102,7 @@ impl CalendarUnit {
     pub fn prev(&mut self, calendar: &Calendar) {
         match self {
             CalendarUnit::Day(day_vec) => todo!(),
-            CalendarUnit::Week(_, _) => todo!(),
+            CalendarUnit::Week(week) => *week -= 1,
             CalendarUnit::Month(year, month) => if *month > 0 {
                 *month -= 1;
             } else  {
@@ -99,7 +116,7 @@ impl CalendarUnit {
     pub fn next(&mut self, calendar: &Calendar) {
         match self {
             CalendarUnit::Day(day_vec) => todo!(),
-            CalendarUnit::Week(_, _) => todo!(),
+            CalendarUnit::Week(week) => *week += 1,
             CalendarUnit::Month(year, month) => if (*month as usize) < calendar.months().len() - 1 {
                 *month += 1;
             } else  {
@@ -113,7 +130,38 @@ impl CalendarUnit {
     pub fn name(&self, calendar: &Calendar) -> String {
         match self {
             CalendarUnit::Day(day_vec) => todo!(),
-            CalendarUnit::Week(_, _) => todo!(),
+            CalendarUnit::Week(week) => {
+                let starting_day = week * calendar.week_def().days().len() as GlobalDayInt;
+                let start_date = calendar.global_to_local(starting_day);
+                let end_date = calendar.global_to_local(
+                    starting_day + (calendar.week_def().days().len() - 1) as GlobalDayInt
+                );
+
+                if start_date.year == end_date.year {
+                    if start_date.month == end_date.month {
+                        format!(
+                            "{} {}",
+                            calendar.months()[end_date.month as usize].name(),
+                            end_date.year
+                        )
+                    } else {
+                        format!(
+                            "{} – {} {}",
+                            calendar.months()[start_date.month as usize].name(),
+                            calendar.months()[end_date.month as usize].name(),
+                            end_date.year
+                        )
+                    }
+                } else {
+                    format!(
+                        "{} {} – {} {}",
+                        calendar.months()[start_date.month as usize].name(),
+                        start_date.year,
+                        calendar.months()[end_date.month as usize].name(),
+                        end_date.year
+                    )
+                }
+            },
             CalendarUnit::Month(year, month) => format!(
                 "{} {}",
                 calendar.months()[*month as usize].name(),
@@ -123,11 +171,35 @@ impl CalendarUnit {
         }
     }
 
-    pub fn convert(&self, typ: CalendarDisplayType) -> Self {
-        match (self, typ) {
-            (Self::Month(year, _), CalendarDisplayType::Year) => Self::Year(*year),
-            (Self::Year(year), CalendarDisplayType::Month) => Self::Month(*year, 0),
-            _ => todo!()
+    pub fn convert(&self, typ: CalendarDisplayType, calendar: &Calendar) -> Self {
+        let global = match self {
+            CalendarUnit::Day(day_vec) => calendar.local_to_global(*day_vec),
+            CalendarUnit::Week(week) => week * calendar.week_def().days().len() as GlobalDayInt,
+            CalendarUnit::Month(year, month) => calendar.local_to_global(DayVec {
+                year: *year,
+                month: *month,
+                day: 0
+            }),
+            CalendarUnit::Year(year) => calendar.local_to_global(DayVec {
+                year: *year,
+                month: 0,
+                day: 0
+            }),
+        };
+
+        return match typ {
+            CalendarDisplayType::Day => Self::Day(calendar.global_to_local(global)),
+            CalendarDisplayType::Week => Self::Week(
+                global / calendar.week_def().days().len() as GlobalDayInt
+            ),
+            CalendarDisplayType::Month => {
+                let local = calendar.global_to_local(global);
+                Self::Month(local.year, local.month)
+            }
+            CalendarDisplayType::Year => {
+                let local = calendar.global_to_local(global);
+                Self::Year(local.year)
+            }
         }
     }
 }

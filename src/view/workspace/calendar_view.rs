@@ -54,7 +54,7 @@ impl CalendarUI {
                 );
 
                 if new_display_type != self.display_type {
-                    self.unit = self.unit.convert(new_display_type);
+                    self.unit = self.unit.convert(new_display_type, &calendar);
                     self.display_type = new_display_type;
                 }
             });
